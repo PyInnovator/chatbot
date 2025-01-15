@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Application</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">AI Chat Application</h1>
+
+        <form id="chat-form">
+            <div class="mb-3">
+                <label for="user-id" class="form-label">User ID</label>
+                <input type="number" id="user-id" class="form-control" placeholder="Enter your user ID" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="user-name" class="form-label">User Name</label>
+                <input type="text" id="user-name" class="form-control" placeholder="Enter your user name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="user-input" class="form-label">Your Message</label>
+                <input type="text" id="user-input" class="form-control" placeholder="Type your message..." required>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Send</button>
+        </form>
+
+        <div id="chat-box" class="border rounded p-3 mt-4" style="height: 300px; overflow-y: scroll;"></div>
+    </div>
+
+    <script>
+        document.getElementById("chat-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const userId = document.getElementById("user-id").value;
+            const userName = document.getElementById("user-name").value;
+            const userInput = document.getElementById("user-input").value;
+
+            if (!userId || !userName || !userInput.trim()) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            const chatBox = document.getElementById("chat-box");
+
+            // Display user's message
+            const userMessage = document.createElement("div");
+            userMessage.className = "text-end mb-2 text-primary";
+            userMessage.textContent = `You: ${userInput}`;
+            chatBox.appendChild(userMessage);
+
+            // Clear input field
+            document.getElementById("user-input").value = "";
+
+            // Send user input to server
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ input: userInput, user_id: userId, user_name: userName })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Display AI response
+                    const aiMessage = document.createElement("div");
+                    aiMessage.className = "text-start mb-2 text-success";
+                    aiMessage.textContent = `AI: ${data.response}`;
+                    chatBox.appendChild(aiMessage);
+                } else {
+                    alert(data.error || "Error communicating with the server.");
+                }
+            } catch (error) {
+                alert("Error: Unable to connect to server.");
+            }
+
+            // Scroll to the bottom of chat box
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    </script>
+</body>
+</html>
