@@ -79,7 +79,7 @@ class UserInteraction(db.Model):
     conversation_memory = db.Column(db.LargeBinary)
 
 # Retrieve API key from environment variables
-api_key = os.getenv('AIzaSyBmGTjBgCuZeKv-Iu8Uj_r_OwIsdXYUhpw')
+api_key = os.getenv('gen_key')
 
 def Model():
     try:
